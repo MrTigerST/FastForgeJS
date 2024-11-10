@@ -1,11 +1,11 @@
 {
   "name": "testing-fastforgejs",
-  "version": "1.3.2",
+  "version": "1.3.5",
   "description": "FastForgeJS makes it easy to create a server and API in a quick and organized way.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "fastforgejs": "bin/index.js"
+    "fastforgejs": "create/index.js"
   },
   "scripts": {
     "build": "tsc",

@@ -1,7 +1,7 @@
-const StartEndpoint = require('./lib/StartEndpoint');
+const Start = require('./lib/Start');
 const Middleware = require('./lib/Middleware');
 
 module.exports = {
-  ...StartEndpoint,
+  ...Start,
   ...Middleware
 };

@@ -2,11 +2,10 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 
-function StartEndpoint(port: number, onListeningCallback: () => void) {
+function Start(port: number, onListeningCallback: () => void) {
   const app = express();
 
   app.use(express.json());
-
 
   function registerRoute(routeModule: any, routePrefix: string) {
     const { Get, Post, Put, Delete, Patch, Head, Options } = routeModule;
@@ -33,7 +32,7 @@ function StartEndpoint(port: number, onListeningCallback: () => void) {
     if(Put){
       switch(typeof(Put)){
         case "function":
-          app.put(formattedPrefix, Post);
+          app.put(formattedPrefix, Put);
         default:
           console.warn("Put is not a function!");
       }
@@ -51,7 +50,7 @@ function StartEndpoint(port: number, onListeningCallback: () => void) {
     if(Patch){
       switch(typeof(Patch)){
         case "function":
-          app.patch(formattedPrefix, Delete);
+          app.patch(formattedPrefix, Patch);
         default:
           console.warn("Patch is not a function!");
       }
@@ -60,7 +59,7 @@ function StartEndpoint(port: number, onListeningCallback: () => void) {
     if(Head){
       switch(typeof(Head)){
         case "function":
-          app.head(formattedPrefix, Delete);
+          app.head(formattedPrefix, Head);
         default:
           console.warn("Patch is not a function!");
       }
@@ -69,17 +68,11 @@ function StartEndpoint(port: number, onListeningCallback: () => void) {
     if(Options){
       switch(typeof(Options)){
         case "function":
-          app.options(formattedPrefix, Delete);
+          app.options(formattedPrefix, Options);
         default:
           console.warn("Patch is not a function!");
       }
     }
-  
-    // if (['get', 'post', 'put', 'delete', 'patch', 'head', 'options'].includes(method)) {
-    //   app[method as HttpMethod](formattedPrefix, handler);
-    // } else {
-    //   console.warn(`Invalid HTTP method: ${method} for route ${formattedPrefix}`);
-    // }
   }
 
   const routesDir = path.join(process.cwd(), 'src');
@@ -127,4 +120,4 @@ function StartEndpoint(port: number, onListeningCallback: () => void) {
   });
 }
 
-export { StartEndpoint };
+export { Start };
