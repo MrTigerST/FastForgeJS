@@ -89,31 +89,7 @@ StartEndpoint(3000, () => {
   console.log("Hello World !");
 });`;
 
-fs.writeFileSync(path.join(projectDir, 'index.js'), indexMain);
-
-  const tsconfigJson = {
-    "compilerOptions": {
-      "module": "ESNext",
-      "target": "ES2020",
-      "esModuleInterop": true,
-      "moduleResolution": "node",
-      "outDir": "dist",
-      "declaration": true,
-      "declarationMap": true,
-      "sourceMap": true,
-      "strict": true,
-      "allowJs": true,
-      "resolveJsonModule": true
-    },
-    "include": [
-      "src/**/*.{ts,js,tsx}"
-    ],
-    "exclude": [
-      "node_modules"
-    ]
-  };
-
-  fs.writeFileSync(path.join(projectDir, 'tsconfig.json'), JSON.stringify(tsconfigJson, null, 2));
+  fs.writeFileSync(path.join(projectDir, 'index.js'), indexMain);
 
   try {
     execSync('npm install', { cwd: projectDir, stdio: 'inherit' });
