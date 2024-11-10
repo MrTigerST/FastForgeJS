@@ -22,6 +22,7 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.18.2",
+    "express-rate-limit": "^7.4.1",
     "inquirer": "^12.0.1",
     "ora": "^8.1.1"
   }
