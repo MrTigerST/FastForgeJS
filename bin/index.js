@@ -1,8 +1,10 @@
-import fs from 'fs';
-import path from 'path';
-import { execSync } from 'child_process';
-import inquirer from 'inquirer';
-const ora = (await import('ora')).default;
+#! /usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+const inquirer = require('inquirer');
+const ora = require('ora');
 
 async function askApiName() {
   const answers = await inquirer.prompt([
@@ -16,7 +18,7 @@ async function askApiName() {
   return answers.apiName;
 }
 
-async function createRouteFolder(routeName: string, apiName: string) {
+async function createRouteFolder(routeName, apiName) {
   const projectRootDir = process.cwd();
   const routePath = path.join(projectRootDir, apiName + '/src', routeName);
 
@@ -54,7 +56,7 @@ async function createApiProject() {
     name: apiName,
     version: '1.0.0',
     description: 'A new API project',
-    main: 'src/index.ts',
+    main: 'src/index.js',
     scripts: {
       dev: 'ts-node index',
       build: 'tsc',
@@ -75,12 +77,12 @@ async function createApiProject() {
 
   fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify(packageJson, null, 2));
 
-  const middleWareTs = `
+  const middleWareJs = `
 const { Middleware } = require('fastforgejs');
 
 Middleware.lockMiddleware('/yourRoute');`;
 
-  fs.writeFileSync(path.join(projectDir, 'src', 'middleware.js'), middleWareTs);
+  fs.writeFileSync(path.join(projectDir, 'src', 'middleware.js'), middleWareJs);
 
   const indexMain = `
 const { StartEndpoint } = require('../src/lib/StartEndpoint');
