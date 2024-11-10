@@ -41,42 +41,42 @@ async function createRouteFolder(routeName, apiName) {
     fs.mkdirSync(routePath, { recursive: true });
 
     const codeFileContentJs = `function Get(req, res){
-    res.send("This is a GET request");
-  }
+  res.send("This is a GET request");
+}
   
-  function Post(req, res){
-    res.send("This is a POST request!");
-  }
+function Post(req, res){
+  res.send("This is a POST request!");
+}
 
-  function Put(req, res){
-    console.log("This is a PUT request");
-  }
+function Put(req, res){
+  res.send("This is a PUT request");
+}
 
-  function Delete(req, res){
-    console.log("This is a DELETE request");
-  }
+function Delete(req, res){
+  res.send("This is a DELETE request");
+}
 
-  function Patch(req, res){
-    console.log("This is a PATCH request");
-  }
+function Patch(req, res){
+  res.send("This is a PATCH request");
+}
 
-  function Head(req, res){
-    console.log("This is a HEAD request");
-  }
+function Head(req, res){
+  res.send("This is a HEAD request");
+}
 
-  function Options(req, res){
-    console.log("This is a OPTIONS request");
-  }
+function Options(req, res){
+  res.send("This is a OPTIONS request");
+}
 
-  module.exports = {
-    Get: Get,
-    Post: Post,
-    Put: Put,
-    Delete: Delete,
-    Patch: Patch,
-    Head: Head,
-    Options: Options
-  };`;
+module.exports = {
+  Get: Get,
+  Post: Post,
+  Put: Put,
+  Delete: Delete,
+  Patch: Patch,
+  Head: Head,
+  Options: Options
+};`;
 
     fs.writeFileSync(path.join(routePath, 'code.js'), codeFileContentJs);
 
