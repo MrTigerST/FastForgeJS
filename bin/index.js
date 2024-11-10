@@ -40,7 +40,7 @@ async function createRouteFolder(routeName, apiName) {
 
     fs.mkdirSync(routePath, { recursive: true });
 
-    const codeFileContentJs = `const { createApi } = require('fastforgejs');
+    const codeFileContentJs = `const { createApi } = require('testing-fastforgejs');
 
       createApi('get', (req, res) => {
         res.send('Response from ${routeName} route!');
@@ -73,7 +73,7 @@ async function createApiProject() {
     },
     dependencies: {
       express: '^4.18.1',
-      fastforgejs: "latest"
+      "testing-fastforgejs": "latest",
     },
     devDependencies: {
       'express': '^4.17.13',
@@ -85,13 +85,13 @@ async function createApiProject() {
 
   fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify(packageJson, null, 2));
 
-  const middleWareJs = `const { Middleware } = require('fastforgejs');
+  const middleWareJs = `const { Middleware } = require('testing-fastforgejs');
 
 Middleware.lockMiddleware('/yourRoute');`;
 
   fs.writeFileSync(path.join(projectDir, 'src', 'middleware.js'), middleWareJs);
 
-  const indexMain = `const { StartEndpoint } = require('fastforgejs');
+  const indexMain = `const { StartEndpoint } = require('testing-fastforgejs');
 
 StartEndpoint(3000, () => {
   console.log("Hello World !");

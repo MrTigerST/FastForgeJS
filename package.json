@@ -1,15 +1,16 @@
 {
-  "name": "fastforgejs",
+  "name": "testing-fastforgejs",
   "version": "1.0.4",
   "description": "FastForgeJS makes it easy to create a server and API in a quick and organized way.",
-  "type": "module",
+  "main": "dist/index.req.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
     "fastforgejs": "bin/index.js"
   },
   "scripts": {
     "build": "tsc",
-    "start": "tsc && node dist/index.js",
-    "setup": "tsc && node dist/setup.js"
+    "setup": "tsc && node bin/index.js"
   },
   "keywords": [],
   "author": "MrTigerST & Dipo",
@@ -21,6 +22,7 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
+    "express": "^4.18.2",
     "inquirer": "^12.0.1",
     "ora": "^8.1.1"
   }
