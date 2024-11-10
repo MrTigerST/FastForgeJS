@@ -28,7 +28,7 @@ async function createRouteFolder(routeName: string, apiName: string) {
     const codeFileContentJs = `
 
       // This file can be a TypeScript file or a JavaScript file.
-      const { createApi } = require('../../../src/lib/RouteTools');
+      const { createApi } = require('fastforgejs');
 
       createApi('get', (req, res) => {
         res.send('Response from ${routeName} route!');
@@ -76,17 +76,17 @@ async function createApiProject() {
   fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify(packageJson, null, 2));
 
   const middleWareTs = `
-import { Middleware } from '../../src/lib/Middleware';
+const { Middleware } = require('fastforgejs');
 
 Middleware.lockMiddleware('/yourRoute');`;
 
   fs.writeFileSync(path.join(projectDir, 'src', 'middleware.js'), middleWareTs);
 
   const indexMain = `
-import { StartEndpoint } from '../src/lib/StartEndpoint';
+const { StartEndpoint } = require('../src/lib/StartEndpoint');
 
 StartEndpoint(3000, () => {
-  console.log("CIAO");
+  console.log("Hello World !");
 });`;
 
 fs.writeFileSync(path.join(projectDir, 'index.js'), indexMain);
