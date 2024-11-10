@@ -1,10 +1,10 @@
 #! /usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
-const inquirer = require('inquirer');
-const ora = require('ora');
+import fs from 'fs';
+import path from 'path';
+import { execSync } from 'child_process';
+import inquirer from 'inquirer';
+import ora from 'ora';
 
 async function askApiName() {
   const answers = await inquirer.prompt([
