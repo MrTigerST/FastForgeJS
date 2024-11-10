@@ -84,8 +84,10 @@ module.exports = {
   }
 }
 
+let apiName;
+
 async function createApiProject() {
-  const apiName = await askApiName();
+  apiName = await askApiName();
   const apiDescription = await askApiDescription();
   const projectDir = path.join(process.cwd(), apiName);
 
@@ -100,10 +102,11 @@ async function createApiProject() {
     description: apiDescription,
     main: 'index.js',
     scripts: {
-      start: 'node .',
+      start: 'nodemon .',
     },
     dependencies: {
       express: '^4.18.1',
+      "cors": "^2.8.5",
       "testing-fastforgejs": "latest",
     },
     devDependencies: {
@@ -116,11 +119,11 @@ async function createApiProject() {
 
   fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify(packageJson, null, 2));
 
-  const middleWareJs = `const { Middleware } = require('testing-fastforgejs');
+//   const middleWareJs = `const { Middleware } = require('testing-fastforgejs');
 
-Middleware.lockMiddleware('/yourRoute');`;
+// Middleware.lockMiddleware('/yourRoute');`;
 
-  fs.writeFileSync(path.join(projectDir, 'src', 'middleware.js'), middleWareJs);
+//   fs.writeFileSync(path.join(projectDir, 'src', 'middleware.js'), middleWareJs);
 
   const indexMain = `const { Start } = require('testing-fastforgejs');
 
@@ -147,7 +150,8 @@ async function setupWorkspace() {
   try {
     await createApiProject();
 
-    console.log(`Project setup complete! Change Directory to your project and run "npm run start" to start your API.`);
+    console.log("The framework has been successfully configured! To start your server run the following commands")
+    console.log(`\n\ncd ${apiName}\nnpm run start`);
   } catch (error) {
     console.error('Error during setup:', error);
   }
