@@ -1,10 +1,20 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
+const app = express();
+
+function NewLimiter(maxReq: number, time: number, message: string) {
+  const limiter = rateLimit({
+    max: maxReq,
+    windowMs: time,
+    message: message
+  })
+  
+  app.use(limiter);
+}
 
 function Start(port: number, onListeningCallback: () => void) {
-  const app = express();
-
   app.use(express.json());
 
   function registerRoute(routeModule: any, routePrefix: string) {
@@ -120,4 +130,4 @@ function Start(port: number, onListeningCallback: () => void) {
   });
 }
 
-export { Start };
+export { Start, NewLimiter };
