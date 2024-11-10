@@ -1,9 +1,10 @@
-namespace Middleware {
-    export function lockMiddleware(route: string) {
-        return (req: any, res: any, next: Function) => {
+const express = require('express');
 
+namespace Middleware {
+    export function lock(route: string, msg: string) {
+        return (req: any, res: any, next: Function) => {
             if (req.originalUrl === route) {
-                return res.status(403).json({ message: `Access to the route ${route} is locked.` });
+                return res.status(403).json({ message: msg || `This route is locked.` });
             }
 
             next();

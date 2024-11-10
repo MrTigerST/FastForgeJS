@@ -1,50 +1,106 @@
-import express from 'express';
-import fs from 'fs';
-import path from 'path';
-import { pathToFileURL } from 'url';
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
 
-async function StartEndpoint(port: number, onListeningCallback: () => void) {
+function StartEndpoint(port: number, onListeningCallback: () => void) {
   const app = express();
 
   app.use(express.json());
 
-  type HttpMethod = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head' | 'options';
 
   function registerRoute(routeModule: any, routePrefix: string) {
-    if (routeModule && routeModule.default) {
-      const { method, handler } = routeModule.default;
+    const { Get, Post, Put, Delete, Patch, Head, Options } = routeModule;
+    const formattedPrefix = routePrefix.startsWith('/') ? routePrefix : `/${routePrefix}`;
 
-      if (method && handler) {
-        if (['get', 'post', 'put', 'delete', 'patch', 'head', 'options'].includes(method)) {
-          app[method as HttpMethod](routePrefix, handler);
-        } else {
-          console.warn(`Invalid HTTP method: ${method} for route ${routePrefix}`);
-        }
+    if(Get){
+      switch(typeof(Get)){
+        case "function":
+          app.get(formattedPrefix, Get);
+        default:
+          console.warn("Get is not a function!");
       }
     }
+
+    if(Post){
+      switch(typeof(Post)){
+        case "function":
+          app.post(formattedPrefix, Post);
+        default:
+          console.warn("Post is not a function!");
+      }
+    }
+
+    if(Put){
+      switch(typeof(Put)){
+        case "function":
+          app.put(formattedPrefix, Post);
+        default:
+          console.warn("Put is not a function!");
+      }
+    }
+
+    if(Delete){
+      switch(typeof(Delete)){
+        case "function":
+          app.delete(formattedPrefix, Delete);
+        default:
+          console.warn("Delete is not a function!");
+      }
+    }
+
+    if(Patch){
+      switch(typeof(Patch)){
+        case "function":
+          app.patch(formattedPrefix, Delete);
+        default:
+          console.warn("Patch is not a function!");
+      }
+    }
+
+    if(Head){
+      switch(typeof(Head)){
+        case "function":
+          app.head(formattedPrefix, Delete);
+        default:
+          console.warn("Patch is not a function!");
+      }
+    }
+
+    if(Options){
+      switch(typeof(Options)){
+        case "function":
+          app.options(formattedPrefix, Delete);
+        default:
+          console.warn("Patch is not a function!");
+      }
+    }
+  
+    // if (['get', 'post', 'put', 'delete', 'patch', 'head', 'options'].includes(method)) {
+    //   app[method as HttpMethod](formattedPrefix, handler);
+    // } else {
+    //   console.warn(`Invalid HTTP method: ${method} for route ${formattedPrefix}`);
+    // }
   }
 
   const routesDir = path.join(process.cwd(), 'src');
 
-  async function exploreRoutes(currentDir: string, routePrefix: string) {
+  function exploreRoutes(currentDir: string, routePrefix: string) {
     const folderList = fs.readdirSync(currentDir);
 
     for (const folder of folderList) {
       const folderPath = path.join(currentDir, folder);
 
       if (fs.lstatSync(folderPath).isDirectory()) {
-        const codeFileTs = path.join(folderPath, 'code.ts');
-        const codeFileJs = path.join(folderPath, 'code.js');
+        const codeMod = path.join(folderPath, 'code.js');
 
-        if (fs.existsSync(codeFileTs)) {
-          const routeModule = await import(pathToFileURL(codeFileTs).href);
+        try {
+          const routeModule = require(codeMod);
           registerRoute(routeModule, routePrefix + folder);
-        } else if (fs.existsSync(codeFileJs)) {
-          const routeModule = await import(pathToFileURL(codeFileJs).href);
-          registerRoute(routeModule, routePrefix + folder);
+        } catch (error) {
+          console.warn(`Could not load route module at ${codeMod}:`, error);
         }
 
-        await exploreRoutes(folderPath, `${routePrefix}${folder}/`);
+        exploreRoutes(folderPath, `${routePrefix}${folder}/`);
       }
     }
   }
@@ -52,15 +108,19 @@ async function StartEndpoint(port: number, onListeningCallback: () => void) {
   const middlewareFileTs = path.join(process.cwd(), 'middleware.ts');
   const middlewareFileJs = path.join(process.cwd(), 'middleware.js');
 
-  if (fs.existsSync(middlewareFileTs)) {
-    const middlewareModule = await import(pathToFileURL(middlewareFileTs).href);
-    app.use(middlewareModule);
-  } else if (fs.existsSync(middlewareFileJs)) {
-    const middlewareModule = await import(pathToFileURL(middlewareFileJs).href);
-    app.use(middlewareModule);
+  try {
+    if (fs.existsSync(middlewareFileTs)) {
+      const middlewareModule = require(middlewareFileTs);
+      app.use(middlewareModule);
+    } else if (fs.existsSync(middlewareFileJs)) {
+      const middlewareModule = require(middlewareFileJs);
+      app.use(middlewareModule);
+    }
+  } catch (error) {
+    console.warn(`Could not load middleware:`, error);
   }
 
-  await exploreRoutes(routesDir, '');
+  exploreRoutes(routesDir, '');
 
   app.listen(port, () => {
     onListeningCallback();

@@ -40,12 +40,20 @@ async function createRouteFolder(routeName, apiName) {
 
     fs.mkdirSync(routePath, { recursive: true });
 
-    const codeFileContentJs = `const { createApi } = require('testing-fastforgejs');
-
-      createApi('get', (req, res) => {
-        res.send('Response from ${routeName} route!');
-      });
-    `;
+    const codeFileContentJs = `function Get(req, res){
+    console.log(req.query.test);
+    res.send("Hello, World!");
+  }
+  
+  function Post(req, res){
+    console.log(req.query.test);
+    res.send("Hello, World! this is a POST");
+  }
+  
+  module.exports = {
+    Get: Get,
+    Post: Post
+  };`;
 
     fs.writeFileSync(path.join(routePath, 'code.js'), codeFileContentJs);
 
@@ -67,7 +75,7 @@ async function createApiProject() {
     name: apiName,
     version: '1.0.0',
     description: apiDescription,
-    main: 'src/index.js',
+    main: 'index.js',
     scripts: {
       start: 'node .',
     },

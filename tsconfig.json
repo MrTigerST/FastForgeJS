@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "esModuleInterop": true,
     "moduleResolution": "node",
     "outDir": "dist",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "strict": true
+    "strict": true,
+    "allowSyntheticDefaultImports": false,
+    "esModuleInterop": false
   },
   "include": [
     "src/**/*.ts"
