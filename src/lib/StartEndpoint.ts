@@ -24,8 +24,7 @@ async function StartEndpoint(port: number, onListeningCallback: () => void) {
     }
   }
 
-  const __dirname = path.dirname(new URL(import.meta.url).pathname);
-  const routesDir = path.join(__dirname, 'routes');
+  const routesDir = path.join(process.cwd(), 'src');
 
   async function exploreRoutes(currentDir: string, routePrefix: string) {
     const folderList = fs.readdirSync(currentDir);
@@ -50,8 +49,9 @@ async function StartEndpoint(port: number, onListeningCallback: () => void) {
     }
   }
 
-  const middlewareFileTs = path.join(__dirname, 'middleware.ts');
-  const middlewareFileJs = path.join(__dirname, 'middleware.js');
+  const middlewareFileTs = path.join(process.cwd(), 'middleware.ts');
+  const middlewareFileJs = path.join(process.cwd(), 'middleware.js');
+
   if (fs.existsSync(middlewareFileTs)) {
     const middlewareModule = await import(pathToFileURL(middlewareFileTs).href);
     app.use(middlewareModule);

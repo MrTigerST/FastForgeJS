@@ -1,12 +1,10 @@
 {
-  "name": "@mrtigerst/fastforgejs",
-  "version": "1.0.2",
+  "name": "fastforgejs",
+  "version": "1.0.4",
   "description": "FastForgeJS makes it easy to create a server and API in a quick and organized way.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "type": "module",
   "bin": {
-    "create-fastforge": "bin/index.js"
+    "fastforgejs": "bin/index.js"
   },
   "scripts": {
     "build": "tsc",

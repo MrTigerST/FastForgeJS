@@ -18,6 +18,19 @@ async function askApiName() {
   return answers.apiName;
 }
 
+async function askApiDescription() {
+  const answers = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'apiDesc',
+      message: 'Enter the description of your API project:',
+      default: '',
+    },
+  ]);
+  return answers.apiName;
+}
+
+
 async function createRouteFolder(routeName, apiName) {
   const projectRootDir = process.cwd();
   const routePath = path.join(projectRootDir, apiName + '/src', routeName);
@@ -27,10 +40,7 @@ async function createRouteFolder(routeName, apiName) {
 
     fs.mkdirSync(routePath, { recursive: true });
 
-    const codeFileContentJs = `
-
-      // This file can be a TypeScript file or a JavaScript file.
-      const { createApi } = require('fastforgejs');
+    const codeFileContentJs = `const { createApi } = require('fastforgejs');
 
       createApi('get', (req, res) => {
         res.send('Response from ${routeName} route!');
@@ -45,6 +55,7 @@ async function createRouteFolder(routeName, apiName) {
 
 async function createApiProject() {
   const apiName = await askApiName();
+  const apiDescription = await askApiDescription();
   const projectDir = path.join(process.cwd(), apiName);
 
   const spinner = ora('Creating project structure...').start();
@@ -55,20 +66,17 @@ async function createApiProject() {
   const packageJson = {
     name: apiName,
     version: '1.0.0',
-    description: 'A new API project',
+    description: apiDescription,
     main: 'src/index.js',
     scripts: {
-      dev: 'ts-node index',
-      build: 'tsc',
-      start: 'node index',
+      start: 'node .',
     },
     dependencies: {
       express: '^4.18.1',
+      fastforgejs: "latest"
     },
     devDependencies: {
-      '@types/express': '^4.17.13',
-      'ts-node': '^10.0.0',
-      typescript: '^4.5.4',
+      'express': '^4.17.13',
     },
     engines: {
       node: '>=14.0.0',
@@ -77,15 +85,13 @@ async function createApiProject() {
 
   fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify(packageJson, null, 2));
 
-  const middleWareJs = `
-const { Middleware } = require('fastforgejs');
+  const middleWareJs = `const { Middleware } = require('fastforgejs');
 
 Middleware.lockMiddleware('/yourRoute');`;
 
   fs.writeFileSync(path.join(projectDir, 'src', 'middleware.js'), middleWareJs);
 
-  const indexMain = `
-const { StartEndpoint } = require('../src/lib/StartEndpoint');
+  const indexMain = `const { StartEndpoint } = require('fastforgejs');
 
 StartEndpoint(3000, () => {
   console.log("Hello World !");
@@ -94,7 +100,7 @@ StartEndpoint(3000, () => {
   fs.writeFileSync(path.join(projectDir, 'index.js'), indexMain);
 
   try {
-    execSync('npm install', { cwd: projectDir, stdio: 'inherit' });
+    execSync('npm install', { cwd: projectDir, stdio: 'ignore' });
     await createRouteFolder('example', apiName);
     spinner.succeed(`API project ${apiName} created and dependencies installed!`);
   } catch (error) {
@@ -110,7 +116,7 @@ async function setupWorkspace() {
   try {
     await createApiProject();
 
-    console.log(`Project setup complete! Run "npm run dev" to start your API.`);
+    console.log(`Project setup complete! Change Directory to your project and run "npm run start" to start your API.`);
   } catch (error) {
     console.error('Error during setup:', error);
   }
