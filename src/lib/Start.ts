@@ -83,45 +83,102 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
         OldGet(req, res);
       }
 
+      console.log(typeof (Get))
+
       switch (typeof (Get)) {
         case "function":
           app.get(formattedPrefix, Get);
+          break;
         default:
           console.warn("Get is not a function!");
       }
     }
 
     if (Post) {
+      const OldPost = Post;
+
+      Post = (req: any, res: any) => {
+        const resp = middleware(formattedPrefix, req);
+
+        if (resp !== null && typeof (resp) === 'function') {
+          resp(res, req);
+          return;
+        }
+
+        OldPost(req, res);
+      }
       switch (typeof (Post)) {
         case "function":
           app.post(formattedPrefix, Post);
+          break;
         default:
           console.warn("Post is not a function!");
       }
     }
 
     if (Put) {
+      const OldPut = Put;
+
+      Put = (req: any, res: any) => {
+        const resp = middleware(formattedPrefix, req);
+
+        if (resp !== null && typeof (resp) === 'function') {
+          resp(res, req);
+          return;
+        }
+
+        OldPut(req, res);
+      }
       switch (typeof (Put)) {
         case "function":
           app.put(formattedPrefix, Put);
+          break;
         default:
           console.warn("Put is not a function!");
       }
     }
 
     if (Delete) {
+      const OldDelete = Delete;
+
+      Delete = (req: any, res: any) => {
+        const resp = middleware(formattedPrefix, req);
+
+        if (resp !== null && typeof (resp) === 'function') {
+          resp(res, req);
+          return;
+        }
+
+        OldDelete(req, res);
+      }
+
       switch (typeof (Delete)) {
         case "function":
           app.delete(formattedPrefix, Delete);
+          break;
         default:
           console.warn("Delete is not a function!");
       }
     }
 
     if (Patch) {
+      const OldPatch = Patch;
+
+      Patch = (req: any, res: any) => {
+        const resp = middleware(formattedPrefix, req);
+
+        if (resp !== null && typeof (resp) === 'function') {
+          resp(res, req);
+          return;
+        }
+
+        OldPatch(req, res);
+      }
+
       switch (typeof (Patch)) {
         case "function":
           app.patch(formattedPrefix, Patch);
+          break;
         default:
           console.warn("Patch is not a function!");
       }
@@ -130,23 +187,44 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
     if (Head) {
       const OldHead = Head;
 
-      Head = (req: object, res: object) => {
-        middleware(formattedPrefix, req, res);
+      Head = (req: any, res: any) => {
+        const resp = middleware(formattedPrefix, req);
+
+        if (resp !== null && typeof (resp) === 'function') {
+          resp(res, req);
+          return;
+        }
+
         OldHead(req, res);
       }
 
       switch (typeof (Head)) {
         case "function":
           app.head(formattedPrefix, Head);
+          break;
         default:
           console.warn("Head is not a function!");
       }
     }
 
     if (Options) {
+      const OldOptions = Options;
+
+      Options = (req: any, res: any) => {
+        const resp = middleware(formattedPrefix, req);
+
+        if (resp !== null && typeof (resp) === 'function') {
+          resp(res, req);
+          return;
+        }
+
+        OldOptions(req, res);
+      }
+      
       switch (typeof (Options)) {
         case "function":
           app.options(formattedPrefix, Options);
+          break;
         default:
           console.warn("Options is not a function!");
       }

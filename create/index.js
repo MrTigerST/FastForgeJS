@@ -1,4 +1,4 @@
-#! /usr/bin/env node
+#!/usr/bin/env node
 
 import fs from 'fs';
 import path from 'path';
@@ -6,28 +6,28 @@ import { execSync } from 'child_process';
 import inquirer from 'inquirer';
 import ora from 'ora';
 
-async function askApiName() {
+async function askserverName() {
   const answers = await inquirer.prompt([
     {
       type: 'input',
-      name: 'apiName',
-      message: 'Enter the name of your API project:',
-      default: 'my-new-api',
+      name: 'serverName',
+      message: 'Enter the name of your Server-side project:',
+      default: 'my-new-server',
     },
   ]);
-  return answers.apiName;
+  return answers.serverName;
 }
 
-async function askApiDescription() {
+async function askserverDescription() {
   const answers = await inquirer.prompt([
     {
       type: 'input',
-      name: 'apiDesc',
-      message: 'Enter the description of your API project:',
+      name: 'serverDesc',
+      message: 'Enter the description of your Server-side project:',
       default: '',
     },
   ]);
-  return answers.apiDesc;
+  return answers.serverDesc;
 }
 
 async function askInstallTypeScript() {
@@ -35,73 +35,113 @@ async function askInstallTypeScript() {
     {
       type: 'confirm',
       name: 'installTS',
-      message: 'Use of TypeScript ?',
+      message: 'Use TypeScript?',
       default: false,
     },
   ]);
   return answers.installTS;
 }
 
-async function createRouteFolder(routeName, apiName) {
+async function createRouteFolder(routeName, serverName, installTS) {
   const projectRootDir = process.cwd();
-  const routePath = path.join(projectRootDir, apiName + '/src', routeName);
+  const routePath = path.join(projectRootDir, serverName + '/src', routeName);
+  const codeFileName = `code.${installTS ? 'ts' : 'js'}`;
 
   if (!fs.existsSync(routePath)) {
     const spinner = ora(`Creating route: ${routeName}...`).start();
 
     fs.mkdirSync(routePath, { recursive: true });
 
-    const codeFileContentJs = `function Get(req, res){
+    const codeFileContent = installTS
+      ? `function Get(req: any, res: any): void {
   res.send("This is a GET request");
 }
 
-function Post(req, res){
+function PostMethod(req: any, res: any): void {
   res.send("This is a POST request!");
 }
 
-function Put(req, res){
+function PutMethod(req: any, res: any): void {
   res.send("This is a PUT request");
 }
 
-function Delete(req, res){
+function DeleteMethod(req: any, res: any): void {
   res.send("This is a DELETE request");
 }
 
-function Patch(req, res){
+function PatchMethod(req: any, res: any): void {
   res.send("This is a PATCH request");
 }
 
-function Head(req, res){
+function HeadMethod(req: any, res: any): void {
   res.send("This is a HEAD request");
 }
 
-function Options(req, res){
-  res.send("This is a OPTIONS request");
+function OptionsMethod(req: any, res: any): void {
+  res.send("This is an OPTIONS request");
+}
+  
+module.exports = {
+  Get: GetMethod,
+  Post: PostMethod,
+  Put: PutMethod,
+  Delete: DeleteMethod,
+  Patch: PatchMethod,
+  Head: HeadMethod,
+  Options: OptionsMethod
+};
+
+`
+      : `function GetMethod(req, res){
+  res.send("This is a GET request");
+}
+
+function PostMethod(req, res){
+  res.send("This is a POST request!");
+}
+
+function PutMethod(req, res){
+  res.send("This is a PUT request");
+}
+
+function DeleteMethod(req, res){
+  res.send("This is a DELETE request");
+}
+
+function PatchMethod(req, res){
+  res.send("This is a PATCH request");
+}
+
+function HeadMethod(req, res){
+  res.send("This is a HEAD request");
+}
+
+function OptionsMethod(req, res){
+  res.send("This is an OPTIONS request");
 }
 
 module.exports = {
-  Get: Get,
-  Post: Post,
-  Put: Put,
-  Delete: Delete,
-  Patch: Patch,
-  Head: Head,
-  Options: Options
+  Get: GetMethod,
+  Post: PostMethod,
+  Put: PutMethod,
+  Delete: DeleteMethod,
+  Patch: PatchMethod,
+  Head: HeadMethod,
+  Options: OptionsMethod
 };`;
 
-    fs.writeFileSync(path.join(routePath, 'code.js'), codeFileContentJs);
-
-    spinner.succeed(`Route ${routeName} created with code.js.`);
+    fs.writeFileSync(path.join(routePath, codeFileName), codeFileContent);
+    spinner.succeed(`Route ${routeName} created with ${codeFileName}.`);
   }
 }
 
-let apiName;
+let serverName;
 
-async function createApiProject() {
-  apiName = await askApiName();
-  const apiDescription = await askApiDescription();
+async function createserverProject() {
+  serverName = await askserverName();
+  const serverDescription = await askserverDescription();
   const installTS = await askInstallTypeScript();
-  const projectDir = path.join(process.cwd(), apiName);
+  const projectDir = path.join(process.cwd(), serverName);
 
   const spinner = ora('Creating project structure...').start();
 
@@ -109,20 +149,20 @@ async function createApiProject() {
   fs.mkdirSync(path.join(projectDir, 'src'), { recursive: true });
 
   const packageJson = {
-    name: apiName,
+    name: serverName,
     version: '1.0.0',
-    description: apiDescription,
-    main: 'index.js',
+    description: serverDescription,
+    main: installTS ? 'index.ts' : 'index.js',
     scripts: {
-      start: 'nodemon .',
+      start: installTS ? 'ts-node index.ts' : 'nodemon .',
     },
     dependencies: {
       express: '^4.18.1',
-      "cors": "^2.8.5",
-      "testing-fastforgejs": "latest",
+      cors: '^2.8.5',
+      'testing-fastforgejs': 'latest',
     },
     devDependencies: {
-      express: '^4.17.13',
+      nodemon: '^2.0.20',
     },
     engines: {
       node: '>=14.0.0',
@@ -135,33 +175,46 @@ async function createApiProject() {
       typescript: '^4.8.4',
       'ts-node': '^10.4.0',
     };
-    packageJson.scripts.start = 'ts-node index.ts';
   }
 
   fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify(packageJson, null, 2));
 
-  const middleWareJs = `const { Middleware } = require("testing-fastforgejs");
+  const middleWareContent = installTS
+    ? `const { Middleware } = require("testing-fastforgejs");
+
+export function onRequest(route: string, req: any) {
+    if(route === "/lockedroute") {
+        return Middleware.lock(route, "This route is locked.");
+    }
+}`
+    : `const { Middleware } = require("testing-fastforgejs");
 
 function onRequest(route, req) {
-    if(route == "/lockedroute"){
+    if(route === "/lockedroute") {
         return Middleware.lock(route, "This route is locked.");
     }
 }
 
 module.exports = onRequest;`;
 
-  fs.writeFileSync(path.join(projectDir, 'src', 'middleware.js'), middleWareJs);
+  fs.writeFileSync(path.join(projectDir, 'src', `middleware.${installTS ? 'ts' : 'js'}`), middleWareContent);
 
   const indexMain = installTS
-    ? `import { Start } from 'testing-fastforgejs';
+    ? `const { Start, Limiter } = require('testing-fastforgejs');
+
+Limiter(5 /*max requests*/, 2*1000 /*time*/, "Rate Limit" /*message if rate limit is exceeded*/);
+Limiter(5, 2*1000, "Rate Limit", "/specialRoute" /*can rate limit specific routes*/);
 
 Start(3000, () => {
-  console.log("Hello World !");
+  console.log("Hello World!");
 });`
-    : `const { Start } = require('testing-fastforgejs');
+    : `const { Start, Limiter } = require('testing-fastforgejs');
+
+Limiter(5 /*max requests*/, 2*1000 /*time*/, "Rate Limit" /*message if rate limit is exceeded*/);
+Limiter(5, 2*1000, "Rate Limit", "/specialRoute" /*can rate limit specific routes*/);
 
 Start(3000, () => {
-  console.log("Hello World !");
+  console.log("Hello World!");
 });`;
 
   fs.writeFileSync(path.join(projectDir, installTS ? 'index.ts' : 'index.js'), indexMain);
@@ -186,10 +239,10 @@ Start(3000, () => {
 
   try {
     execSync('npm install', { cwd: projectDir, stdio: 'ignore' });
-    await createRouteFolder('example', apiName);
-    spinner.succeed(`API project ${apiName} created and dependencies installed!`);
+    await createRouteFolder('example', serverName, installTS);
+    spinner.succeed(`server project ${serverName} created and dependencies installed!`);
   } catch (error) {
-    spinner.fail('Error during API project setup.');
+    spinner.fail('Error during server project setup.');
     console.error('Error:', error);
     throw error;
   }
@@ -199,10 +252,10 @@ async function setupWorkspace() {
   console.log('Setting up workspace for creating server scripts ...');
 
   try {
-    await createApiProject();
+    await createserverProject();
 
-    console.log("The framework has been successfully configured! To start your server, run the following commands:")
-    console.log(`\n\ncd ${apiName}\nnpm run start`);
+    console.log("The framework has been successfully configured! To start your server, run the following commands:");
+    console.log(`\n\ncd ${serverName}\nnpm run start`);
   } catch (error) {
     console.error('Error during setup:', error);
   }
