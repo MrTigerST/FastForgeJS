@@ -27,9 +27,20 @@ async function askApiDescription() {
       default: '',
     },
   ]);
-  return answers.apiName;
+  return answers.apiDesc;
 }
 
+async function askInstallTypeScript() {
+  const answers = await inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'installTS',
+      message: 'Use of TypeScript ?',
+      default: false,
+    },
+  ]);
+  return answers.installTS;
+}
 
 async function createRouteFolder(routeName, apiName) {
   const projectRootDir = process.cwd();
@@ -43,7 +54,7 @@ async function createRouteFolder(routeName, apiName) {
     const codeFileContentJs = `function Get(req, res){
   res.send("This is a GET request");
 }
-  
+
 function Post(req, res){
   res.send("This is a POST request!");
 }
@@ -89,6 +100,7 @@ let apiName;
 async function createApiProject() {
   apiName = await askApiName();
   const apiDescription = await askApiDescription();
+  const installTS = await askInstallTypeScript();
   const projectDir = path.join(process.cwd(), apiName);
 
   const spinner = ora('Creating project structure...').start();
@@ -110,28 +122,67 @@ async function createApiProject() {
       "testing-fastforgejs": "latest",
     },
     devDependencies: {
-      'express': '^4.17.13',
+      express: '^4.17.13',
     },
     engines: {
       node: '>=14.0.0',
     },
   };
 
+  if (installTS) {
+    packageJson.devDependencies = {
+      ...packageJson.devDependencies,
+      typescript: '^4.8.4',
+      'ts-node': '^10.4.0',
+    };
+    packageJson.scripts.start = 'ts-node index.ts';
+  }
+
   fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify(packageJson, null, 2));
 
-//   const middleWareJs = `const { Middleware } = require('testing-fastforgejs');
+  const middleWareJs = `const { Middleware } = require("testing-fastforgejs");
 
-// Middleware.lockMiddleware('/yourRoute');`;
+function onRequest(route, req) {
+    if(route == "/lockedroute"){
+        return Middleware.lock(route, "This route is locked.");
+    }
+}
 
-//   fs.writeFileSync(path.join(projectDir, 'src', 'middleware.js'), middleWareJs);
+module.exports = onRequest;`;
 
-  const indexMain = `const { Start } = require('testing-fastforgejs');
+  fs.writeFileSync(path.join(projectDir, 'src', 'middleware.js'), middleWareJs);
+
+  const indexMain = installTS
+    ? `import { Start } from 'testing-fastforgejs';
+
+Start(3000, () => {
+  console.log("Hello World !");
+});`
+    : `const { Start } = require('testing-fastforgejs');
 
 Start(3000, () => {
   console.log("Hello World !");
 });`;
 
-  fs.writeFileSync(path.join(projectDir, 'index.js'), indexMain);
+  fs.writeFileSync(path.join(projectDir, installTS ? 'index.ts' : 'index.js'), indexMain);
+
+  if (installTS) {
+    const tsConfig = {
+      compilerOptions: {
+        target: 'ES2020',
+        module: 'commonjs',
+        strict: true,
+        esModuleInterop: true,
+        skipLibCheck: true,
+        forceConsistentCasingInFileNames: true,
+        outDir: './dist',
+      },
+      include: ['./src/**/*'],
+      exclude: ['node_modules'],
+    };
+
+    fs.writeFileSync(path.join(projectDir, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2));
+  }
 
   try {
     execSync('npm install', { cwd: projectDir, stdio: 'ignore' });
@@ -150,7 +201,7 @@ async function setupWorkspace() {
   try {
     await createApiProject();
 
-    console.log("The framework has been successfully configured! To start your server run the following commands")
+    console.log("The framework has been successfully configured! To start your server, run the following commands:")
     console.log(`\n\ncd ${apiName}\nnpm run start`);
   } catch (error) {
     console.error('Error during setup:', error);

@@ -1,6 +1,6 @@
-const Start = require('./lib/Start');
-const Limiter = require('./lib/Start');
-const Middleware = require('./lib/Middleware');
+const Start: any = require('./lib/Start');
+const Limiter: any = require('./lib/Start');
+const Middleware: any = require('./lib/Middleware');
 
 module.exports = {
   ...Start,

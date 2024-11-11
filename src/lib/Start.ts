@@ -35,17 +35,54 @@ function Limiter(maxReq: number, time: number, message: string, route?: string) 
  * @param onListeningCallback Callback when server start.
  * @param useCors Use CORS.
  * @param corsOptions CORS options.
- */
-function Start(port: number, onListeningCallback: () => void, useCors?: boolean, corsOptions?: object) {
-  function registerRoute(routeModule: any, routePrefix: string) {
-    const { Get, Post, Put, Delete, Patch, Head, Options } = routeModule;
-    const formattedPrefix = routePrefix.startsWith('/') ? routePrefix : `/${routePrefix}`;
+*/
 
-    if(useCors){
+let alreadyStarted = false;
+
+function Start(port: number, onListeningCallback: () => void, useCors?: boolean, corsOptions?: object) {
+  if (alreadyStarted) {
+    console.warn("The server has already been started!");
+    return;
+  }
+
+  alreadyStarted = true;
+  const middlewarePathJs = path.join(process.cwd(), 'src', 'middleware.js');
+  const middlewarePathTs = path.join(process.cwd(), 'src', 'middleware.ts');
+  let middleware: any;
+
+  if (fs.existsSync(middlewarePathTs)) {
+    require('ts-node').register({ transpileOnly: true });
+    middleware = require(middlewarePathTs);
+  } else if (fs.existsSync(middlewarePathJs)) {
+    middleware = require(middlewarePathJs);
+  }
+
+  function registerRoute(routeModule: any, routePrefix: string) {
+    let { Get, Post, Put, Delete, Patch, Head, Options } = routeModule;
+    let formattedPrefix = routePrefix.startsWith('/') ? routePrefix : `/${routePrefix}`;
+
+    if (!formattedPrefix.endsWith('/')) {
+      formattedPrefix += '/';
+    }
+
+    if (useCors) {
       app.use(cors(corsOptions));
     }
 
     if (Get) {
+      const OldGet = Get;
+
+      Get = (req: any, res: any) => {
+        const resp = middleware(formattedPrefix, req);
+
+        if (resp !== null && typeof (resp) === 'function') {
+          resp(res, req);
+          return;
+        }
+
+        OldGet(req, res);
+      }
+
       switch (typeof (Get)) {
         case "function":
           app.get(formattedPrefix, Get);
@@ -91,11 +128,18 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
     }
 
     if (Head) {
+      const OldHead = Head;
+
+      Head = (req: object, res: object) => {
+        middleware(formattedPrefix, req, res);
+        OldHead(req, res);
+      }
+
       switch (typeof (Head)) {
         case "function":
           app.head(formattedPrefix, Head);
         default:
-          console.warn("Patch is not a function!");
+          console.warn("Head is not a function!");
       }
     }
 
@@ -104,7 +148,7 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
         case "function":
           app.options(formattedPrefix, Options);
         default:
-          console.warn("Patch is not a function!");
+          console.warn("Options is not a function!");
       }
     }
   }
@@ -115,60 +159,27 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
   function exploreRoutes(currentDir: string, routePrefix: string): void {
     const folderList = fs.readdirSync(currentDir);
 
-    for (const folder of folderList) {
-      const folderPath = path.join(currentDir, folder);
+    for (const item of folderList) {
+      const itemPath = path.join(currentDir, item);
+      const isDirectory = fs.lstatSync(itemPath).isDirectory();
 
-      if (fs.lstatSync(folderPath).isDirectory()) {
-        const hasSubfolders = fs.readdirSync(folderPath).some((item: string) => {
-          const itemPath = path.join(folderPath, item);
-          return fs.lstatSync(itemPath).isDirectory();
-        });
+      if (isDirectory) {
+        exploreRoutes(itemPath, `${routePrefix}${item}/`);
+      } else if (item === 'code.js' || item === 'code.ts') {
+        try {
+          let routeModule;
 
-        if (hasSubfolders) {
-          exploreRoutes(folderPath, `${routePrefix}${folder}/`);
-        } else {
-          const codeModJs = path.join(folderPath, 'code.js');
-          const codeModTs = path.join(folderPath, 'code.ts');
-          const codeMod = fs.existsSync(codeModJs) ? codeModJs : fs.existsSync(codeModTs) ? codeModTs : null;
-
-          if (codeMod) {
-            try {
-              let routeModule;
-              if (codeMod.endsWith('.ts')) {
-                routeModule = require('ts-node').register({
-                  transpileOnly: true,
-                });
-                routeModule = require(codeMod);
-              } else {
-                routeModule = require(codeMod);
-              }
-              registerRoute(routeModule, routePrefix + folder);
-            } catch (error) {
-              console.warn(`Could not load route module at ${codeMod}:`, error);
-            }
-          } else {
-            console.warn(`Missing route module (code.js/code.ts) in directory: ${folderPath}`);
+          if (item.endsWith('.ts')) {
+            require('ts-node').register({ transpileOnly: true });
           }
+
+          routeModule = require(itemPath);
+          registerRoute(routeModule, routePrefix);
+        } catch (error) {
+          console.warn(`Could not load route code at ${itemPath}:`, error);
         }
       }
     }
-  }
-
-
-
-  const middlewareFileTs = path.join(process.cwd(), 'middleware.ts');
-  const middlewareFileJs = path.join(process.cwd(), 'middleware.js');
-
-  try {
-    if (fs.existsSync(middlewareFileTs)) {
-      const middlewareModule = require(middlewareFileTs);
-      app.use(middlewareModule);
-    } else if (fs.existsSync(middlewareFileJs)) {
-      const middlewareModule = require(middlewareFileJs);
-      app.use(middlewareModule);
-    }
-  } catch (error) {
-    console.warn(`Could not load middleware:`, error);
   }
 
   exploreRoutes(routesDir, '');

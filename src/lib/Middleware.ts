@@ -1,13 +1,19 @@
-const express = require('express');
-
 namespace Middleware {
-    export function lock(route: string, msg: string) {
-        return (req: any, res: any, next: Function) => {
+    export function Lock(route: string, msg: any) {
+        return (res: any, req: any) => {
             if (req.originalUrl === route) {
-                return res.status(403).json({ message: msg || `This route is locked.` });
+                if (typeof(msg) == "string") {
+                    return res.status(403).send(msg ?? "The Route is locked.");
+                } else if(typeof(msg) == "object") {
+                    return res.status(403).json(msg ?? {message: "The Route is locked."});
+                }
             }
-
-            next();
+        };
+    }
+    
+    export function Redirect(url: string) {
+        return (res: any) => {
+            res.redirect(url);
         };
     }
 }
