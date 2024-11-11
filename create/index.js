@@ -206,7 +206,7 @@ Limiter(5 /*max requests*/, 2*1000 /*time*/, "Rate Limit" /*message if rate limi
 Limiter(5, 2*1000, "Rate Limit", "/specialRoute" /*can rate limit specific routes*/);
 
 Start(3000, () => {
-  console.log("Hello World!");
+  console.log("Hello World! I am hosted in localhost on port 3000 (http://localhost:3000) ! You can change the port and various settings on the index file of this project!");
 });`
     : `const { Start, Limiter } = require('testing-fastforgejs');
 
@@ -214,7 +214,7 @@ Limiter(5 /*max requests*/, 2*1000 /*time*/, "Rate Limit" /*message if rate limi
 Limiter(5, 2*1000, "Rate Limit", "/specialRoute" /*can rate limit specific routes*/);
 
 Start(3000, () => {
-  console.log("Hello World!");
+  console.log("Hello World! I am hosted in localhost on port 3000 (http://localhost:3000) ! You can change the port and various settings on the index file of this project!");
 });`;
 
   fs.writeFileSync(path.join(projectDir, installTS ? 'index.ts' : 'index.js'), indexMain);
