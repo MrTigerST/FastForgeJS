@@ -83,8 +83,6 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
         OldGet(req, res);
       }
 
-      console.log(typeof (Get))
-
       switch (typeof (Get)) {
         case "function":
           app.get(formattedPrefix, Get);
