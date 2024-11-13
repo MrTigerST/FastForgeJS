@@ -53,7 +53,7 @@ async function createRouteFolder(routeName, serverName, installTS) {
     fs.mkdirSync(routePath, { recursive: true });
 
     const codeFileContent = installTS
-      ? `function Get(req: any, res: any): void {
+      ? `function GetMethod(req: any, res: any): void {
   res.send("This is a GET request");
 }
 
@@ -152,9 +152,9 @@ async function createserverProject() {
     name: serverName,
     version: '1.0.0',
     description: serverDescription,
-    main: installTS ? 'index.ts' : 'index.js',
+    main: installTS ? 'nodemon index.ts' : 'index.js',
     scripts: {
-      start: installTS ? 'ts-node index.ts' : 'nodemon .',
+      start: installTS ? 'nodemon index.ts' : 'nodemon .',
     },
     dependencies: {
       express: '^4.18.1',
@@ -182,16 +182,17 @@ async function createserverProject() {
   const middleWareContent = installTS
     ? `const { Middleware } = require("testing-fastforgejs");
 
-export function onRequest(route: string, req: any) {
+function onRequest(route: string, req: any) {
     if(route === "/lockedroute") {
-        return Middleware.lock(route, "This route is locked.");
+        return Middleware.Lock(route, "This route is locked.");
     }
-}`
+}
+module.exports = onRequest;`
     : `const { Middleware } = require("testing-fastforgejs");
 
 function onRequest(route, req) {
     if(route === "/lockedroute") {
-        return Middleware.lock(route, "This route is locked.");
+        return Middleware.Lock(route, "This route is locked.");
     }
 }
 

@@ -29,6 +29,18 @@ function Limiter(maxReq: number, time: number, message: string, route?: string) 
   }
 }
 
+function Use(content: any, route?: string) {
+  try {
+    if (route) {
+      app.use(route, content);
+    } else {
+      app.use(content);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 /**
  * Start the Server.
  * @param port Port to Host the Routes Server.
@@ -61,10 +73,8 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
     let { Get, Post, Put, Delete, Patch, Head, Options } = routeModule;
     let formattedPrefix = routePrefix.startsWith('/') ? routePrefix : `/${routePrefix}`;
 
-    if (!formattedPrefix.endsWith('/')) {
-      formattedPrefix += '/';
-    }
-
+    formattedPrefix = formattedPrefix.replace(/\/$/, '');
+    
     if (useCors) {
       app.use(cors(corsOptions));
     }
@@ -76,7 +86,7 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
         const resp = middleware(formattedPrefix, req);
 
         if (resp !== null && typeof (resp) === 'function') {
-          resp(res, req);
+          resp(req, res);
           return;
         }
 
@@ -99,7 +109,7 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
         const resp = middleware(formattedPrefix, req);
 
         if (resp !== null && typeof (resp) === 'function') {
-          resp(res, req);
+          resp(req, res);
           return;
         }
 
@@ -121,7 +131,7 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
         const resp = middleware(formattedPrefix, req);
 
         if (resp !== null && typeof (resp) === 'function') {
-          resp(res, req);
+          resp(req, res);
           return;
         }
 
@@ -143,7 +153,7 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
         const resp = middleware(formattedPrefix, req);
 
         if (resp !== null && typeof (resp) === 'function') {
-          resp(res, req);
+          resp(req, res);
           return;
         }
 
@@ -166,7 +176,7 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
         const resp = middleware(formattedPrefix, req);
 
         if (resp !== null && typeof (resp) === 'function') {
-          resp(res, req);
+          resp(req, res);
           return;
         }
 
@@ -189,7 +199,7 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
         const resp = middleware(formattedPrefix, req);
 
         if (resp !== null && typeof (resp) === 'function') {
-          resp(res, req);
+          resp(req, res);
           return;
         }
 
@@ -212,7 +222,7 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
         const resp = middleware(formattedPrefix, req);
 
         if (resp !== null && typeof (resp) === 'function') {
-          resp(res, req);
+          resp(req, res);
           return;
         }
 
@@ -265,4 +275,4 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
   });
 }
 
-export { Start, Limiter };
+export { Start, Limiter, Use };
