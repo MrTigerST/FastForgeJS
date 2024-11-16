@@ -1,4 +1,5 @@
 ![FastForgeJS](https://i.ibb.co/Lhz9C92/fastforgejs-white.png)
+![FastForgeJSBlack](https://i.ibb.co/862X7wg/fastforgejs-black.png)
 
 ### FastForgeJS is a Framework that makes easy the process to create a server and API in a quick and organized way.
 ## How to install
