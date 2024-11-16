@@ -111,6 +111,7 @@ The code file represents the code of your Route, and you can provide the respons
 
 On FastForgeJS, the management of these methods is done in the following way:
 
+**Note: the `req` and `res` parameters are the same as in [Express](https://expressjs.com/en/api.html).**
 **JavaScript**
 ```js
 function GetMethod(req, res){
