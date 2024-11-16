@@ -40,7 +40,7 @@ Start the Server.
 * **httpsOptions:** HTTPS Options (optional).
 
 ```ts
-Start(port: number, onListeningCallback: () => void, corsOptions?: object, httpsOptions?: { key: string; cert: string; passphrase?: string; }
+Start(port: number, onListeningCallback: () => void, corsOptions?: object, httpsOptions?: { key: string; cert: string; passphrase?: string; })
 ```
 ### Example of HTTP Server for Start Function
 ```ts
