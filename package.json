@@ -1,6 +1,6 @@
 {
-  "name": "testing-fastforgejs",
-  "version": "2.0.6",
+  "name": "fastforgejs",
+  "version": "1.0.0",
   "description": "FastForgeJS makes it easy to create a server and API in a quick and organized way.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
