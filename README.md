@@ -198,7 +198,7 @@ module.exports = {
 
 - [@MrTigerST](https://www.github.com/mrtigerst)
 
-- [@ThatsDipo](https://www.github.com/mrtigerst)
+- [@ThatsDipo](https://github.com/ThatsDipo)
 
 Anyone can contribute to the project by making a Pull Request!
 
