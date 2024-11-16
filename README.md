@@ -52,7 +52,7 @@ Start(3000, () => {
 ```ts
 Start(3000, () => {
   console.log("I am hosted in localhost on port 3000 (http://localhost:3000) ! You can change the port and various settings on the index file of this project!");
-}, null, { key: "your dir for file .key", cert: "your dir for file .cert" });
+}, null, { key: "your dir for file .key", cert: "your dir for file .crt" });
 ```
 
 #
