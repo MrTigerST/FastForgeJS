@@ -30,6 +30,11 @@ function Limiter(maxReq: number, time: number, message: string, route?: string) 
   }
 }
 
+/**
+ * Equivalent of 'use' function on Express.
+ * @param content Content to use.
+ * @param route Route where the content is used on the express app (optional).
+*/
 function Use(content: any, route?: string) {
   try {
     if (route) {
@@ -42,6 +47,12 @@ function Use(content: any, route?: string) {
   }
 }
 
+
+/**
+ * Equivalent of 'set' function on Express.
+ * @param setting Setting to change
+ * @param val Value to write on the setting
+*/
 function Set(setting: string, val: any) {
   try {
     app.set(setting, val);
@@ -50,6 +61,9 @@ function Set(setting: string, val: any) {
   }
 }
 
+/*
+ * Directory of MySQL connection. 
+*/
 function MySqlDir(): string {
   const mysqldirectoryJs = path.join(process.cwd(), 'src', 'db.js');
   const mysqldirectoryTs = path.join(process.cwd(), 'src', 'db.ts');
@@ -63,17 +77,15 @@ function MySqlDir(): string {
   }
 }
 
+let alreadyStarted = false;
 
 /**
  * Start the Server.
  * @param port Port to Host the Routes Server.
  * @param onListeningCallback Callback when server start.
- * @param useCors Use CORS.
- * @param corsOptions CORS options.
+ * @param corsOptions CORS options (optional).
+ * @param httpsOptions HTTPS Options (optional).
 */
-
-let alreadyStarted = false;
-
 function Start(port: number, onListeningCallback: () => void, corsOptions?: object, httpsOptions?: { key: string; cert: string; passphrase?: string; }) {
   if (alreadyStarted) {
     console.warn("The server has already been started! You have a duplicate of the start function on your code.");

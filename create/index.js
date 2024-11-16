@@ -247,7 +247,7 @@ async function createRouteFolder(routeName, serverName, installTS, installMySQL)
     fs.mkdirSync(routePath, { recursive: true });
     //MySqlDir
     const codeFileContent = installTS
-      ? `${installMySQL ? 'const { MySqlDir } = require("testing-fastforgejs");\nconst mysql = require(MySqlDir());\n\n' : ''}function GetMethod(req: any, res: any): void {
+      ? `${installMySQL ? 'const { MySqlDir } = require("testing-fastforgejs");\nconst mysqlConn = require(MySqlDir());\n\n' : ''}function GetMethod(req: any, res: any): void {
   res.send("This is a GET request");
 }
 
@@ -286,7 +286,7 @@ module.exports = {
 };
 
 `
-      : `${installMySQL ? 'const { MySqlDir } = require("testing-fastforgejs");\nconst mysql = require(MySqlDir());\n\n' : ''}function GetMethod(req, res){
+      : `${installMySQL ? 'const { MySqlDir } = require("testing-fastforgejs");\nconst mysqlConn = require(MySqlDir());\n\n' : ''}function GetMethod(req, res){
   res.send("This is a GET request");
 }
 
