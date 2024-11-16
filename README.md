@@ -1,5 +1,5 @@
-![FastForgeJS](https://i.ibb.co/Lhz9C92/fastforgejs-white.png)
 ![FastForgeJSBlack](https://i.ibb.co/862X7wg/fastforgejs-black.png)
+![FastForgeJS](https://i.ibb.co/Lhz9C92/fastforgejs-white.png)
 
 ### FastForgeJS is a Framework that makes easy the process to create a server and API in a quick and organized way.
 ## How to install
@@ -105,13 +105,16 @@ To make queries on mysql, you must first include its connection, which is contai
 const { MySqlDir } = require("fastforge");
 const mysqlConn = require(MySqlDir());
 ```
+
+To perform MySQL queries or other operations, follow the [mysql2 library documentation](https://sidorares.github.io/node-mysql2/docs).
 # Structure of code.js / code.ts File
 
 The code file represents the code of your Route, and you can provide the response to different methods, such as GET, POST, PUT etc...
 
 On FastForgeJS, the management of these methods is done in the following way:
 
-**Note: the `req` and `res` parameters are the same as in [Express](https://expressjs.com/en/api.html).**
+#### **Note: the `req` and `res` parameters are the same as in [Express](https://expressjs.com/en/api.html).**
+
 **JavaScript**
 ```js
 function GetMethod(req, res){
@@ -202,6 +205,4 @@ module.exports = {
 
 - [@ThatsDipo](https://github.com/ThatsDipo)
 
-Anyone can contribute to the project by making a Pull Request!
-
-
+Anyone can contribute to the project by making a Pull Request !
