@@ -213,7 +213,7 @@ module.exports = connection;`;
 
 
 async function installDependencies(projectDir, installMySQL, /*installPrisma,*/ installTs) {
-  const dependencies = ['express', 'cors', 'testing-fastforgejs@latest', 'dotenv'];
+  const dependencies = ['express', 'cors', 'fastforge@latest', 'dotenv'];
   const devDependencies = ['nodemon'];
 
   if (installTs) {
@@ -247,7 +247,7 @@ async function createRouteFolder(routeName, serverName, installTS, installMySQL)
     fs.mkdirSync(routePath, { recursive: true });
     //MySqlDir
     const codeFileContent = installTS
-      ? `${installMySQL ? 'const { MySqlDir } = require("testing-fastforgejs");\nconst mysqlConn = require(MySqlDir());\n\n' : ''}function GetMethod(req: any, res: any): void {
+      ? `${installMySQL ? 'const { MySqlDir } = require("fastforge");\nconst mysqlConn = require(MySqlDir());\n\n' : ''}function GetMethod(req: any, res: any): void {
   res.send("This is a GET request");
 }
 
@@ -286,7 +286,7 @@ module.exports = {
 };
 
 `
-      : `${installMySQL ? 'const { MySqlDir } = require("testing-fastforgejs");\nconst mysqlConn = require(MySqlDir());\n\n' : ''}function GetMethod(req, res){
+      : `${installMySQL ? 'const { MySqlDir } = require("fastforge");\nconst mysqlConn = require(MySqlDir());\n\n' : ''}function GetMethod(req, res){
   res.send("This is a GET request");
 }
 
@@ -372,7 +372,7 @@ async function createServerProject() {
   fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify(packageJson, null, 2));
 
   const middleWareContent = installTS
-    ? `const { Middleware } = require("testing-fastforgejs");
+    ? `const { Middleware } = require("fastforge");
 
 function onRequest(route: string, req: any) {
     if(route === "/lockedroute") {
@@ -380,7 +380,7 @@ function onRequest(route: string, req: any) {
     }
 }
 module.exports = onRequest;`
-    : `const { Middleware } = require("testing-fastforgejs");
+    : `const { Middleware } = require("fastforge");
 
 function onRequest(route, req) {
     if(route === "/lockedroute") {
@@ -397,7 +397,7 @@ module.exports = onRequest;`;
   }
 
   const indexMain = installTS
-    ? `const { Start, Limiter } = require('testing-fastforgejs');
+    ? `const { Start, Limiter } = require('fastforge');
 
 Limiter(5 /*max requests*/, 2*1000 /*time*/, "Rate Limit" /*message if rate limit is exceeded*/);
 Limiter(5, 2*1000, "Rate Limit", "/specialRoute" /*can rate limit specific routes*/);
@@ -405,7 +405,7 @@ Limiter(5, 2*1000, "Rate Limit", "/specialRoute" /*can rate limit specific route
 Start(3000, () => {
   console.log("I am hosted in localhost on port 3000 (http://localhost:3000 or https://localhost:3000 if you are set server for HTTPS) ! You can change the port and various settings on the index file of this project!");
 });`
-    : `const { Start, Limiter } = require('testing-fastforgejs');
+    : `const { Start, Limiter } = require('fastforge');
 
 Limiter(5 /*max requests*/, 2*1000 /*time*/, "Rate Limit" /*message if rate limit is exceeded*/);
 Limiter(5, 2*1000, "Rate Limit", "/specialRoute" /*can rate limit specific routes*/);

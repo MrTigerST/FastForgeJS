@@ -6,7 +6,7 @@
 To install FastForgeJS :
 
 ```bash
-npx fastforgejs
+npx fastforge
 ```
 ## How to use it
 
@@ -101,7 +101,7 @@ Set(setting: string, val: any)
 To make queries on mysql, you must first include its connection, which is contained in the **db.js / db.ts file**. Use this code snippet to include it:
 
 ```js
-const { MySqlDir } = require("testing-fastforgejs");
+const { MySqlDir } = require("fastforge");
 const mysqlConn = require(MySqlDir());
 ```
 # Structure of code.js / code.ts File
