@@ -20,12 +20,12 @@ The Middleware is an intermediary between the client request and the server requ
 
 **Locks the specified Route for the client.**
 ```ts
-Middleware.Lock(route: string, msg: string)
+return Middleware.Lock(route: string, msg: string)
 ```
 
 **Redirects the request to a new URL.**
 ```ts
-Middleware.Redirect(url: string)
+return Middleware.Redirect(url: string)
 ```
 ## Start File
 
