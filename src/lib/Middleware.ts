@@ -3,9 +3,9 @@ namespace Middleware {
         return (req: any, res: any) => {
             if(req.originalUrl === route){
                 if (typeof(msg) == "string") {
-                    return res.status(403).send("The Route is locked.");
+                    return res.status(403).send(msg ?? "The Route is locked.");
                 } else if(typeof(msg) == "object") {
-                    return res.status(403).json({message: "The Route is locked."});
+                    return res.status(403).json(msg ?? {message: "The Route is locked."});
                 } else {
                     return res.status(403).send("The Route is locked.");
                 }

@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
+const https = require('https');
 
 const app = express();
 app.use(express.json());
@@ -41,6 +42,28 @@ function Use(content: any, route?: string) {
   }
 }
 
+function Set(setting: string, val: any) {
+  try {
+    app.set(setting, val);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function MySqlDir(): string {
+  const mysqldirectoryJs = path.join(process.cwd(), 'src', 'db.js');
+  const mysqldirectoryTs = path.join(process.cwd(), 'src', 'db.ts');
+
+  if (fs.existsSync(mysqldirectoryJs)) {
+    return mysqldirectoryJs;
+  } else if (fs.existsSync(mysqldirectoryTs)) {
+    return mysqldirectoryTs;
+  } else {
+    return 'error';
+  }
+}
+
+
 /**
  * Start the Server.
  * @param port Port to Host the Routes Server.
@@ -51,9 +74,9 @@ function Use(content: any, route?: string) {
 
 let alreadyStarted = false;
 
-function Start(port: number, onListeningCallback: () => void, useCors?: boolean, corsOptions?: object) {
+function Start(port: number, onListeningCallback: () => void, corsOptions?: object, httpsOptions?: { key: string; cert: string; passphrase?: string; }) {
   if (alreadyStarted) {
-    console.warn("The server has already been started!");
+    console.warn("The server has already been started! You have a duplicate of the start function on your code.");
     return;
   }
 
@@ -74,8 +97,8 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
     let formattedPrefix = routePrefix.startsWith('/') ? routePrefix : `/${routePrefix}`;
 
     formattedPrefix = formattedPrefix.replace(/\/$/, '');
-    
-    if (useCors) {
+
+    if (corsOptions) {
       app.use(cors(corsOptions));
     }
 
@@ -228,7 +251,7 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
 
         OldOptions(req, res);
       }
-      
+
       switch (typeof (Options)) {
         case "function":
           app.options(formattedPrefix, Options);
@@ -240,7 +263,6 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
   }
 
   const routesDir = path.join(process.cwd(), 'src');
-
 
   function exploreRoutes(currentDir: string, routePrefix: string): void {
     const folderList = fs.readdirSync(currentDir);
@@ -270,9 +292,34 @@ function Start(port: number, onListeningCallback: () => void, useCors?: boolean,
 
   exploreRoutes(routesDir, '');
 
-  app.listen(port, () => {
-    onListeningCallback();
-  });
+
+  if (httpsOptions) {
+    const { key, cert, passphrase } = httpsOptions;
+
+    if (!fs.existsSync(key) || !fs.existsSync(cert)) {
+      console.error("HTTPS options are invalid.");
+      return;
+    }
+
+    const httpsServer = https.createServer(
+      {
+        key: fs.readFileSync(key),
+        cert: fs.readFileSync(cert),
+        passphrase: passphrase || undefined
+      },
+      app
+    );
+
+    httpsServer.listen(port, () => {
+      onListeningCallback();
+    })
+
+  } else {
+    app.listen(port, () => {
+      onListeningCallback();
+    });
+  }
+
 }
 
-export { Start, Limiter, Use };
+export { Start, Limiter, Use, Set, MySqlDir };

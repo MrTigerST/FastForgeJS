@@ -1,11 +1,15 @@
-const Start: any = require('./lib/Start');
-const Limiter: any = require('./lib/Start');
-const Use: any = require('./lib/Start');
-const Middleware: any = require('./lib/Middleware');
+"use strict";
 
-module.exports = {
+const Start = require("./lib/Start");
+const Limiter = require("./lib/Start");
+const Use = require("./lib/Start");
+const Middleware = require("./lib/Middleware");
+
+const FastForgeJS = {
   ...Start,
   ...Limiter,
   ...Use,
   ...Middleware
 };
+
+module.exports = FastForgeJS;
