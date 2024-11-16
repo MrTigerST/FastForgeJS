@@ -20,12 +20,12 @@ The Middleware is an intermediary between the client request and the server requ
 
 **Locks the specified Route for the client.**
 ```ts
-return Middleware.Lock(route: string, msg: string)
+return Middleware.Lock(route: string, msg: string);
 ```
 
 **Redirects the request to a new URL.**
 ```ts
-return Middleware.Redirect(url: string)
+return Middleware.Redirect(url: string);
 ```
 ## Start File
 
@@ -40,7 +40,7 @@ Start the Server.
 * **httpsOptions:** HTTPS Options (optional).
 
 ```ts
-Start(port: number, onListeningCallback: () => void, corsOptions?: object, httpsOptions?: { key: string; cert: string; passphrase?: string; })
+Start(port: number, onListeningCallback: () => void, corsOptions?: object, httpsOptions?: { key: string; cert: string; passphrase?: string; });
 ```
 ### Example of HTTP Server for Start Function
 ```ts
@@ -59,7 +59,7 @@ Start(3000, () => {
 Now let's describe other functions available for the Start File : 
 
 ## Limiter Function intestation
-Equivalent of 'use' function on Express.
+Set a rate limit for your routes.
 
 * **maxReq:** Maximum requests per time.
 * **time:** Timee in seconds.
@@ -67,7 +67,7 @@ Equivalent of 'use' function on Express.
 * **route:** Route to rate limit.
 
 ```ts
-Limiter(maxReq: number, time: number, message: string, route?: string)
+Limiter(maxReq: number, time: number, message: string, route?: string);
 ```
 ### Example of Limiter for all Routes
 ```ts
@@ -85,7 +85,7 @@ Equivalent of 'use' function on Express.
  * **route:** Route where the content is used on the express app (optional).
 
 ```ts
-Use(content: any, route?: string)
+Use(content: any, route?: string);
 ```
 
 ## Set Function intestation
@@ -95,7 +95,7 @@ Equivalent of 'set' function on Express.
 * **val:** Value to write on the setting
 
 ```ts
-Set(setting: string, val: any)
+Set(setting: string, val: any);
 ```
 # Include MySQL
 
@@ -111,7 +111,7 @@ To perform MySQL queries or other operations, follow the [mysql2 library documen
 
 The code file represents the code of your Route, and you can provide the response to different methods, such as GET, POST, PUT etc...
 
-On FastForgeJS, the management of these methods is done in the following way:
+On FastForgeJS, the management of these HTTP methods is done in the following way:
 
 #### **Note: the `req` and `res` parameters are the same as in [Express](https://expressjs.com/en/api.html).**
 
@@ -196,6 +196,71 @@ module.exports = {
   Head: HeadMethod,
   Options: OptionsMethod
 };
+```
+
+### NOTE: You can use this other method to manage HTTP methods : 
+
+**JavaScript**
+```js
+export function Get(req, res){
+  res.send("This is a GET request");
+}
+
+export function Post(req, res){
+  res.send("This is a POST request!");
+}
+
+export function Put(req, res){
+  res.send("This is a PUT request");
+}
+
+export function Delete(req, res){
+  res.send("This is a DELETE request");
+}
+
+export function Patch(req, res){
+  res.send("This is a PATCH request");
+}
+
+export function Head(req, res){
+  res.send("This is a HEAD request");
+}
+
+export function Options(req, res){
+  res.send("This is an OPTIONS request");
+}
+```
+
+
+**TypeScript**
+```ts
+export function Get(req: any, res: any): void {
+  res.send("This is a GET request");
+}
+
+export function Post(req: any, res: any): void {
+  res.send("This is a POST request!");
+}
+
+export function Put(req: any, res: any): void {
+  res.send("This is a PUT request");
+}
+
+export function Delete(req: any, res: any): void {
+  res.send("This is a DELETE request");
+}
+
+export function Patch(req: any, res: any): void {
+  res.send("This is a PATCH request");
+}
+
+export function Head(req: any, res: any): void {
+  res.send("This is a HEAD request");
+}
+
+export function Options(req: any, res: any): void {
+  res.send("This is an OPTIONS request");
+}
 ```
 
 

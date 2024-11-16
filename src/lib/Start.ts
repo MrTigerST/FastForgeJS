@@ -10,7 +10,7 @@ app.use(express.json());
 const cors = require('cors');
 
 /**
- * Set a limits for your routes.
+ * Set a rate limit for your routes.
  * @param maxReq Maximum requests per time.
  * @param time Timee in seconds.
  * @param message Message if ratelimit is triggered.
