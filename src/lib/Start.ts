@@ -121,7 +121,11 @@ function Start(port: number, onListeningCallback: () => void, corsOptions?: obje
         const resp = middleware(formattedPrefix, req);
 
         if (resp !== null && typeof (resp) === 'function') {
-          resp(req, res);
+          if (req !== undefined) {
+            resp(req, res);
+          } else {
+            resp(res);
+          }
           return;
         }
 
@@ -144,7 +148,11 @@ function Start(port: number, onListeningCallback: () => void, corsOptions?: obje
         const resp = middleware(formattedPrefix, req);
 
         if (resp !== null && typeof (resp) === 'function') {
-          resp(req, res);
+          if (req !== undefined) {
+            resp(req, res);
+          } else {
+            resp(res);
+          }
           return;
         }
 
@@ -166,7 +174,11 @@ function Start(port: number, onListeningCallback: () => void, corsOptions?: obje
         const resp = middleware(formattedPrefix, req);
 
         if (resp !== null && typeof (resp) === 'function') {
-          resp(req, res);
+          if (req !== undefined) {
+            resp(req, res);
+          } else {
+            resp(res);
+          }
           return;
         }
 
@@ -188,7 +200,11 @@ function Start(port: number, onListeningCallback: () => void, corsOptions?: obje
         const resp = middleware(formattedPrefix, req);
 
         if (resp !== null && typeof (resp) === 'function') {
-          resp(req, res);
+          if (req !== undefined) {
+            resp(req, res);
+          } else {
+            resp(res);
+          }
           return;
         }
 
@@ -211,7 +227,11 @@ function Start(port: number, onListeningCallback: () => void, corsOptions?: obje
         const resp = middleware(formattedPrefix, req);
 
         if (resp !== null && typeof (resp) === 'function') {
-          resp(req, res);
+          if (req !== undefined) {
+            resp(req, res);
+          } else {
+            resp(res);
+          }
           return;
         }
 
@@ -234,7 +254,11 @@ function Start(port: number, onListeningCallback: () => void, corsOptions?: obje
         const resp = middleware(formattedPrefix, req);
 
         if (resp !== null && typeof (resp) === 'function') {
-          resp(req, res);
+          if (req !== undefined) {
+            resp(req, res);
+          } else {
+            resp(res);
+          }
           return;
         }
 
@@ -257,7 +281,11 @@ function Start(port: number, onListeningCallback: () => void, corsOptions?: obje
         const resp = middleware(formattedPrefix, req);
 
         if (resp !== null && typeof (resp) === 'function') {
-          resp(req, res);
+          if (req !== undefined) {
+            resp(req, res);
+          } else {
+            resp(res);
+          }
           return;
         }
 

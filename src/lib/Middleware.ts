@@ -23,7 +23,7 @@ namespace Middleware {
      * @param url The URL where the user should be redirected.
     */
     export function Redirect(url: string) {
-        return (res: any) => {
+        return (req: any, res: any) => {
             res.redirect(url);
         };
     }
