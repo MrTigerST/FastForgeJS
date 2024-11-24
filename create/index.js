@@ -273,6 +273,10 @@ function HeadMethod(req: any, res: any): void {
 function OptionsMethod(req: any, res: any): void {
   res.send("This is an OPTIONS request");
 }
+
+function AllMethod(req: any, res: any): void {
+  res.send("This route accepts all HTTP methods");
+}
   
 module.exports = {
   Get: GetMethod,
@@ -281,7 +285,8 @@ module.exports = {
   Delete: DeleteMethod,
   Patch: PatchMethod,
   Head: HeadMethod,
-  Options: OptionsMethod
+  Options: OptionsMethod,
+  All: AllMethod
 };
 
 `
@@ -313,6 +318,10 @@ function OptionsMethod(req, res){
   res.send("This is an OPTIONS request");
 }
 
+function AllMethod(req, res){
+  res.send("This route accepts all HTTP methods");
+}
+
 module.exports = {
   Get: GetMethod,
   Post: PostMethod,
@@ -320,10 +329,14 @@ module.exports = {
   Delete: DeleteMethod,
   Patch: PatchMethod,
   Head: HeadMethod,
-  Options: OptionsMethod
+  Options: OptionsMethod,
+  All: AllMethod
 };`;
 
     fs.writeFileSync(path.join(routePath, codeFileName), codeFileContent);
+
+
+    
     spinner.succeed(`Route ${routeName} created with ${codeFileName}.`);
   }
 }
@@ -570,6 +583,7 @@ dist
 
   await installDependencies(projectDir, installMySQL, /*installPrisma,*/ installTS);
   await createRouteFolder('example', serverName, installTS, installMySQL);
+  await createRouteFolder('', serverName, installTS, installMySQL);
 
   spinner.succeed(`Server project ${serverName} created!`);
 }

@@ -6,17 +6,22 @@ namespace Middleware {
     */
     export function Lock(route: string, msg?: any) {
         return (req: any, res: any) => {
-            if(req.originalUrl === route){
-                if (typeof(msg) == "string") {
+            const protocol = req.protocol || (req.secure ? "https" : "http");
+            const requestPath = new URL(req.originalUrl, `${protocol}://${req.headers.host}`).pathname;
+
+            if (requestPath === route) {
+                if (typeof msg === "string") {
                     return res.status(403).send(msg ?? "The Route is locked.");
-                } else if(typeof(msg) == "object") {
-                    return res.status(403).json(msg ?? {message: "The Route is locked."});
+                } else if (typeof msg === "object") {
+                    return res.status(403).json(msg ?? { message: "The Route is locked." });
                 } else {
                     return res.status(403).send("The Route is locked.");
                 }
             }
         };
     }
+
+
 
     /**
      * Redirects the user to a URL.

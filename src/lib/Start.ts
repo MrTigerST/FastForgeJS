@@ -105,7 +105,7 @@ function Start(port: number, onListeningCallback: () => void, corsOptions?: obje
   }
 
   function registerRoute(routeModule: any, routePrefix: string) {
-    let { Get, Post, Put, Delete, Patch, Head, Options } = routeModule;
+    let { Get, Post, Put, Delete, Patch, Head, Options, All } = routeModule;
     let formattedPrefix = routePrefix.startsWith('/') ? routePrefix : `/${routePrefix}`;
 
     formattedPrefix = formattedPrefix.replace(/\/$/, '');
@@ -295,6 +295,33 @@ function Start(port: number, onListeningCallback: () => void, corsOptions?: obje
       switch (typeof (Options)) {
         case "function":
           app.options(formattedPrefix, Options);
+          break;
+        default:
+          console.warn("Options is not a function!");
+      }
+    }
+
+    if (All) {
+      const OldAll = Options;
+
+      All = (req: any, res: any) => {
+        const resp = middleware(formattedPrefix, req);
+
+        if (resp !== null && typeof (resp) === 'function') {
+          if (req !== undefined) {
+            resp(req, res);
+          } else {
+            resp(res);
+          }
+          return;
+        }
+
+        OldAll(req, res);
+      }
+
+      switch (typeof (All)) {
+        case "function":
+          app.all(formattedPrefix, Options);
           break;
         default:
           console.warn("Options is not a function!");
