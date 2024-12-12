@@ -97,6 +97,23 @@ Equivalent of 'set' function on Express.
 ```ts
 Set(setting: string, val: any);
 ```
+<hr>
+
+### NOTE: You can use other Express functions/attributes by inserting the following code:
+
+```js
+const { App } = require("fastforge");
+const app = App();
+
+app.all('/test', function (req, res, next) {
+    console.log('test');
+    next();
+});
+
+```
+
+<hr>
+
 # Include MySQL
 
 To make queries on mysql, you must first include its connection, which is contained in the **db.js / db.ts file**. Use this code snippet to include it:

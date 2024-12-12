@@ -9,6 +9,12 @@ app.use(express.json());
 
 const cors = require('cors');
 
+
+
+function App() {
+  return app;
+}
+
 /**
  * Set a rate limit for your routes.
  * @param maxReq Maximum requests per time.
@@ -395,4 +401,4 @@ function Start(port: number, onListeningCallback: () => void, corsOptions?: obje
 
 }
 
-export { Start, Limiter, Use, Set, MySqlDir };
+export { Start, Limiter, Use, Set, App, MySqlDir };
