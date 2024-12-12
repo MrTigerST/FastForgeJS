@@ -339,7 +339,12 @@ function Start(port: number, onListeningCallback: () => void, corsOptions?: obje
       const isDirectory = fs.lstatSync(itemPath).isDirectory();
 
       if (isDirectory) {
-        exploreRoutes(itemPath, `${routePrefix}${item}/`);
+        const dynamicRouteMatch = item.match(/^\[(.+?)\]$/);
+        const newPrefix = dynamicRouteMatch
+          ? `${routePrefix}:${dynamicRouteMatch[1]}/`
+          : `${routePrefix}${item}/`;
+
+        exploreRoutes(itemPath, newPrefix);
       } else if (item === 'code.js' || item === 'code.ts') {
         try {
           let routeModule;
@@ -356,6 +361,7 @@ function Start(port: number, onListeningCallback: () => void, corsOptions?: obje
       }
     }
   }
+
 
   exploreRoutes(routesDir, '');
 
