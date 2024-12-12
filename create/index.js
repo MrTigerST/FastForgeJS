@@ -2,13 +2,10 @@
 
 import fs from 'fs';
 import path from 'path';
-import { exec } from 'child_process';
+import { execSync } from 'child_process';
 import inquirer from 'inquirer';
 import ora from 'ora';
-import util from 'util';
 
-
-const execAsync = util.promisify(exec);
 
 async function askServerName() {
   const answers = await inquirer.prompt([
@@ -206,8 +203,8 @@ async function installDependencies(projectDir, installMySQL, installTs) {
   }
 
   const spinner = ora('Installing dependencies...').start();
-  execAsync(`npm install ${dependencies.join(' ')}`, { cwd: projectDir, stdio: 'ignore' });
-  execAsync(`npm install -D ${devDependencies.join(' ')}`, { cwd: projectDir, stdio: 'ignore' });
+  execSync(`npm install ${dependencies.join(' ')}`, { cwd: projectDir, stdio: 'ignore' });
+  execSync(`npm install -D ${devDependencies.join(' ')}`, { cwd: projectDir, stdio: 'ignore' });
   spinner.succeed('Dependencies installed!');
 }
 
