@@ -2,9 +2,12 @@
 
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+import { exec } from 'child_process';
 import inquirer from 'inquirer';
 import ora from 'ora';
+
+
+const execAsync = util.promisify(exec);
 
 async function askServerName() {
   const answers = await inquirer.prompt([
@@ -53,21 +56,6 @@ async function askInstallMySQL() {
   ]);
   return answers.installMySQL;
 }
-
-/*
-async function askInstallPrisma() {
-  const answers = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'installPrisma',
-      message: 'Install Prisma for ORM?',
-      default: false,
-    },
-  ]);
-  return answers.installPrisma;
-}
-
-*/
 
 async function askDatabaseDetails() {
   const answers = await inquirer.prompt([
@@ -123,7 +111,7 @@ async function askDatabaseDetails() {
   };
 }
 
-async function createDatabaseConfig(serverName, /*installPrisma,*/ installMySQL, dbConfig, installTS) {
+async function createDatabaseConfig(serverName, installMySQL, dbConfig, installTS) {
   let dbConfigContent = `
 DB_HOST=${dbConfig.DB_HOST}
 DB_USER=${dbConfig.DB_USER}
@@ -132,30 +120,9 @@ DB_DATABASE=${dbConfig.DB_DATABASE}
 DB_PORT=${dbConfig.DB_PORT}
 `;
 
-
-/*
-  if (installPrisma) {
-    dbConfigContent += `DATABASE_URL="mysql://${dbConfig.DB_USER}:${dbConfig.DB_PASSWORD}@${dbConfig.DB_HOST}:${dbConfig.DB_PORT}/${dbConfig.DB_DATABASE}"\n`;
-
-    const prismaSchema = `
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-}
-`;
-    fs.mkdirSync(path.join(serverName, 'prisma'), { recursive: true });
-    fs.writeFileSync(path.join(serverName, 'prisma', 'schema.prisma'), prismaSchema);
-  }
-
-  */
-
   fs.writeFileSync(path.join(serverName, '.env'), dbConfigContent);
 
-  if (installMySQL/* && !installPrisma*/) {
+  if (installMySQL) {
     const dbFileContent = installTS ? `const mysqlLib = require('mysql2');
 const dotenv = require('dotenv');
 
@@ -211,7 +178,20 @@ module.exports = connection;`;
 }
 
 
-async function installDependencies(projectDir, installMySQL, /*installPrisma,*/ installTs) {
+async function askInstallEnvBridge() {
+  const answers = await inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'installEnvBridge',
+      message: 'Setup EnvBridge JSON (https://github.com/MrTigerST/envbridge) ?',
+      default: false,
+    },
+  ]);
+  return answers.installEnvBridge;
+}
+
+
+async function installDependencies(projectDir, installMySQL, installTs) {
   const dependencies = ['express', 'cors', 'fastforge@latest', 'dotenv'];
   const devDependencies = ['nodemon'];
 
@@ -224,20 +204,15 @@ async function installDependencies(projectDir, installMySQL, /*installPrisma,*/ 
     dependencies.push('mysql2');
   }
 
-  // if (installPrisma) {
-  //   dependencies.push('@prisma/client');
-  //   devDependencies.push('prisma');
-  // }
-
   const spinner = ora('Installing dependencies...').start();
-  execSync(`npm install ${dependencies.join(' ')}`, { cwd: projectDir, stdio: 'ignore' });
-  execSync(`npm install -D ${devDependencies.join(' ')}`, { cwd: projectDir, stdio: 'ignore' });
+  execAsync(`npm install ${dependencies.join(' ')}`, { cwd: projectDir, stdio: 'ignore' });
+  execAsync(`npm install -D ${devDependencies.join(' ')}`, { cwd: projectDir, stdio: 'ignore' });
   spinner.succeed('Dependencies installed!');
 }
 
 async function createRouteFolder(routeName, serverName, installTS, installMySQL) {
   const projectRootDir = process.cwd();
-  const routePath = path.join(projectRootDir, serverName + '/src', routeName);
+  const routePath = path.join(projectRootDir, serverName + 'src', routeName);
   const codeFileName = `code.${installTS ? 'ts' : 'js'}`;
 
   if (!fs.existsSync(routePath)) {
@@ -336,7 +311,7 @@ module.exports = {
     fs.writeFileSync(path.join(routePath, codeFileName), codeFileContent);
 
 
-    
+
     spinner.succeed(`Route ${routeName} created with ${codeFileName}.`);
   }
 }
@@ -348,15 +323,13 @@ async function createServerProject() {
   const serverDescription = await askServerDescription();
   const installTS = await askInstallTypeScript();
   const installMySQL = await askInstallMySQL();
-  // let installPrisma = false;
-  // if (!installMySQL) {
-  //   installPrisma = await askInstallPrisma();
-  // }
 
   let databaseDetails;
-  if (installMySQL/* || installPrisma*/) {
+  if (installMySQL) {
     databaseDetails = await askDatabaseDetails();
   }
+
+  const installEnvBridge = await askInstallEnvBridge();
 
   const projectDir = path.join(process.cwd(), serverName);
 
@@ -364,12 +337,6 @@ async function createServerProject() {
 
   fs.mkdirSync(projectDir, { recursive: true });
   fs.mkdirSync(path.join(projectDir, 'src'), { recursive: true });
-
-  /*
-  if (installPrisma) {
-    fs.mkdirSync(path.join(projectDir, 'prisma'), { recursive: true });
-  }
-    */
 
   const packageJson = {
     name: serverName,
@@ -404,8 +371,28 @@ module.exports = onRequest;`;
 
   fs.writeFileSync(path.join(projectDir, 'src', `middleware.${installTS ? 'ts' : 'js'}`), middleWareContent);
 
-  if (installMySQL/* || installPrisma*/) {
-    await createDatabaseConfig(serverName, /*installPrisma,*/ installMySQL, databaseDetails, installTS);
+  if (installMySQL) {
+    await createDatabaseConfig(serverName, installMySQL, databaseDetails, installTS);
+  }
+
+  if (installEnvBridge) {
+    const envBridgeConfig = {
+      dataenv: [
+        {
+          name: "TOKEN",
+          description: "Lorem ipsum dolor sit amet",
+          defaultValue: 'A simple Default Value.',
+        },
+        {
+          name: "TOKEN2",
+          description: "Lorem ipsum dolor sit amet 2",
+          defaultValue: '',
+        }
+      ]
+    }
+
+    const envBridgeFilePath = path.join(projectDir, 'envinfo.json');
+    fs.writeFileSync(envBridgeFilePath, JSON.stringify(envBridgeConfig, null, 4), 'utf8');
   }
 
   const indexMain = installTS
@@ -581,8 +568,107 @@ dist
     fs.writeFileSync(path.join(projectDir, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2));
   }
 
-  await installDependencies(projectDir, installMySQL, /*installPrisma,*/ installTS);
+  await installDependencies(projectDir, installMySQL, installTS);
   await createRouteFolder('example', serverName, installTS, installMySQL);
+
+  const projectRootDir = process.cwd();
+  const routePath = path.join(projectRootDir, serverName + 'src');
+  const codeFileName = `code.${installTS ? 'ts' : 'js'}`;
+
+  if (!fs.existsSync(routePath)) {
+    fs.mkdirSync(routePath);
+  }
+
+  const codeFileContent = installTS
+    ? `${installMySQL ? 'const { MySqlDir } = require("fastforge");\nconst mysqlConn = require(MySqlDir());\n\n' : ''}function GetMethod(req: any, res: any): void {
+res.send("This is a GET request");
+}
+
+function PostMethod(req: any, res: any): void {
+res.send("This is a POST request!");
+}
+
+function PutMethod(req: any, res: any): void {
+res.send("This is a PUT request");
+}
+
+function DeleteMethod(req: any, res: any): void {
+res.send("This is a DELETE request");
+}
+
+function PatchMethod(req: any, res: any): void {
+res.send("This is a PATCH request");
+}
+
+function HeadMethod(req: any, res: any): void {
+res.send("This is a HEAD request");
+}
+
+function OptionsMethod(req: any, res: any): void {
+res.send("This is an OPTIONS request");
+}
+
+function AllMethod(req: any, res: any): void {
+res.send("This route accepts all HTTP methods");
+}
+
+module.exports = {
+Get: GetMethod,
+Post: PostMethod,
+Put: PutMethod,
+Delete: DeleteMethod,
+Patch: PatchMethod,
+Head: HeadMethod,
+Options: OptionsMethod,
+All: AllMethod
+};
+
+`
+    : `${installMySQL ? 'const { MySqlDir } = require("fastforge");\nconst mysqlConn = require(MySqlDir());\n\n' : ''}function GetMethod(req, res){
+res.send("This is a GET request");
+}
+
+function PostMethod(req, res){
+res.send("This is a POST request!");
+}
+
+function PutMethod(req, res){
+res.send("This is a PUT request");
+}
+
+function DeleteMethod(req, res){
+res.send("This is a DELETE request");
+}
+
+function PatchMethod(req, res){
+res.send("This is a PATCH request");
+}
+
+function HeadMethod(req, res){
+res.send("This is a HEAD request");
+}
+
+function OptionsMethod(req, res){
+res.send("This is an OPTIONS request");
+}
+
+function AllMethod(req, res){
+res.send("This route accepts all HTTP methods");
+}
+
+module.exports = {
+Get: GetMethod,
+Post: PostMethod,
+Put: PutMethod,
+Delete: DeleteMethod,
+Patch: PatchMethod,
+Head: HeadMethod,
+Options: OptionsMethod,
+All: AllMethod
+};`;
+
+  fs.writeFileSync(path.join(routePath, codeFileName), codeFileContent);
+
   await createRouteFolder('', serverName, installTS, installMySQL);
 
   spinner.succeed(`Server project ${serverName} created!`);

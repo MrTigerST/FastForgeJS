@@ -10,7 +10,10 @@ app.use(express.json());
 const cors = require('cors');
 
 
-
+/**
+ * Returns the Express App.
+ * @returns Express App.
+ */
 function App() {
   return app;
 }
@@ -108,6 +111,15 @@ function Start(port: number, onListeningCallback: () => void, corsOptions?: obje
     middleware = require(middlewarePathTs);
   } else if (fs.existsSync(middlewarePathJs)) {
     middleware = require(middlewarePathJs);
+  }
+
+
+  function handleServerError(error: any) {
+    if (error.code === 'EADDRINUSE') {
+      console.error(`Port ${port} is already in use. Please choose a different port.`);
+    } else {
+      console.error('An unexpected error occurred:', error);
+    }
   }
 
   function registerRoute(routeModule: any, routePrefix: string) {
@@ -393,10 +405,14 @@ function Start(port: number, onListeningCallback: () => void, corsOptions?: obje
       onListeningCallback();
     })
 
+    httpsServer.on('error', handleServerError);
+
   } else {
-    app.listen(port, () => {
+    const server = app.listen(port, () => {
       onListeningCallback();
     });
+
+    server.on('error', handleServerError);
   }
 
 }
