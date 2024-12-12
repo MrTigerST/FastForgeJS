@@ -213,7 +213,7 @@ async function installDependencies(projectDir, installMySQL, installTs) {
 
 async function createRouteFolder(routeName, serverName, installTS, installMySQL) {
   const projectRootDir = process.cwd();
-  const routePath = path.join(projectRootDir, serverName + 'src', routeName);
+  const routePath = path.join(projectRootDir, serverName + '/src', routeName);
   const codeFileName = `code.${installTS ? 'ts' : 'js'}`;
 
   if (!fs.existsSync(routePath)) {
