@@ -573,7 +573,7 @@ dist
   await createRouteFolder('example', serverName, installTS, installMySQL);
 
   const projectRootDir = process.cwd();
-  const routePath = path.join(projectRootDir, serverName + 'src');
+  const routePath = path.join(projectRootDir, serverName + '/src');
   const codeFileName = `code.${installTS ? 'ts' : 'js'}`;
 
   if (!fs.existsSync(routePath)) {
