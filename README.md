@@ -13,6 +13,15 @@ npx fastforge
 
 To create a Route, you just need to create a folder in the src directory with the name of the Route, and inside it create a file called code.js or code.ts in case you want to develop in TypeScript (remember that if you created the project in JavaScript and you want to convert it to TypeScript, you should install ts-node and run the project with this module).
 Inside the src you will find the Middleware and also the file db.js/db.ts, in case you chose to install the support for MySQL.
+
+**You can also put dynamic Routes (for example the route 'product/12345' by structuring the folder in the following way:**
+
+- `src/product/[id]`
+
+**and the code.ts / code.js to implement the behavior of the Routes is located in the following directory:**
+
+- `src/product/[id]/code.ts | code.js`
+
 ## Middleware
 
 The Middleware is an intermediary between the client request and the server request, and our system provides 2 methods for managing the Middleware:
